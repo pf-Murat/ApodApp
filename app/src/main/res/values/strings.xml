@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ApodApp</string>
+
+    <string name="nav_item_search">Search</string>
+    <string name="nav_item_explore">Explore</string>
+    <string name="nav_item_favorites">Favorites</string>
 </resources>
