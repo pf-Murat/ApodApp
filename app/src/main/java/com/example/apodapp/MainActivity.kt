@@ -52,6 +52,7 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
+    val viewModel = MainViewModel()
     ApodAppTheme {
         SearchScreen(viewModel)
     }
