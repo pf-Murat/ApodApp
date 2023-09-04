@@ -12,17 +12,18 @@ import androidx.navigation.compose.composable
 
 @Composable
 fun MainNavigationHolderScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: MainViewModel
 ) {
     NavHost(navController = navController, startDestination = NavBarScreens.Search.route) {
         composable(NavBarScreens.Search.route) {
-            SearchScreen()
+            SearchScreen(viewModel = viewModel)
         }
         composable(NavBarScreens.Explore.route) {
-            ExploreScreen()
+            ExploreScreen(viewModel = viewModel)
         }
         composable(NavBarScreens.Favorites.route) {
-            FavoritesScreen()
+            FavoritesScreen(viewModel = viewModel)
         }
     }
 }

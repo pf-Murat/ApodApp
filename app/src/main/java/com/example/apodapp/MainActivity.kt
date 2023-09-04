@@ -26,6 +26,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
+            val viewModel = MainViewModel()
             ApodAppTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -37,7 +38,10 @@ class MainActivity : ComponentActivity() {
                     }
                 ) { innerPaddings ->
                     Box(modifier = Modifier.padding(innerPaddings)) {
-                        MainNavigationHolderScreen(navController = navController)
+                        MainNavigationHolderScreen(
+                            navController = navController,
+                            viewModel = viewModel
+                        )
                     }
                 }
             }
@@ -49,6 +53,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GreetingPreview() {
     ApodAppTheme {
-        SearchScreen()
+        SearchScreen(viewModel)
     }
 }
