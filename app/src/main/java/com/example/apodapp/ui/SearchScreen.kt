@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.example.apodapp.ApodCardComponent
 import com.example.apodapp.MainViewModel
 import com.example.apodapp.PAGE_SIZE
@@ -37,9 +38,8 @@ import com.example.apodapp.getBackEndTime
 import java.util.Calendar
 
 
-
 @Composable
-fun SearchScreen(viewModel: MainViewModel) {
+fun SearchScreen(viewModel: MainViewModel, navController: NavHostController) {
     val context = LocalContext.current
     val apodList by viewModel.searchApods.collectAsStateWithLifecycle()
     val errorState by viewModel.errorState.collectAsStateWithLifecycle()
@@ -155,6 +155,14 @@ fun SearchScreen(viewModel: MainViewModel) {
                                 viewModel.addToFavorites(item)
                             else
                                 viewModel.removeFromFavorites(item)
+                        },
+                        onClick = {
+                            navController.navigate(
+                                createFullScreenImageRoute(
+                                    url = item.url,
+                                    hdUrl = item.hdUrl
+                                )
+                            )
                         }
                     )
                 }

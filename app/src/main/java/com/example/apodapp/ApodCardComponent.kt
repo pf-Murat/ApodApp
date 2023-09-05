@@ -1,6 +1,7 @@
 package com.example.apodapp
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,13 +43,15 @@ fun ApodCardComponent(
     onFavClicked: () -> Unit,
     showLikeButton: Boolean = true,
     showShareButton: Boolean = true,
-    paintColor: Color = Color.Transparent
+    paintColor: Color = Color.Transparent,
+    onClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxSize(.9f)
-            .aspectRatio(1f),
+            .aspectRatio(1f)
+            .clickable { onClick.invoke() },
     ) {
         Box(modifier = Modifier.fillMaxSize())
         {

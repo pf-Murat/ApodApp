@@ -60,7 +60,7 @@ fun GreetingPreview() {
     val context = LocalContext.current
     val viewModel = MainViewModel(context)
     ApodAppTheme {
-        SearchScreen(viewModel)
+        SearchScreen(viewModel, rememberNavController())
     }
 }
 
