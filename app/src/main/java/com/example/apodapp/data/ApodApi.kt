@@ -1,5 +1,9 @@
-package com.example.apodapp.ui.theme
+package com.example.apodapp.data
 
+import androidx.room.Database
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.RoomDatabase
 import com.google.gson.annotations.SerializedName
 import retrofit2.Response
 import retrofit2.http.GET
@@ -18,9 +22,11 @@ interface ApodApi {
     ): Response<List<ApodItem>>
 }
 
+@Entity
 data class ApodItem(
-    val copyright: String = "",
+    @PrimaryKey
     val date: String = "",
+    val copyright: String = "",
     val explanation: String = "",
     @SerializedName("media_type")
     val mediaType: String = "",
@@ -32,3 +38,9 @@ data class ApodItem(
     val hdUrl: String = "",
     val isFavorited: Boolean = false
 )
+
+@Database(entities = [ApodItem::class], version = 1)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun apodDao(): ApodDao
+}
+

@@ -1,4 +1,4 @@
-package com.example.apodapp
+package com.example.apodapp.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.apodapp.ui.theme.EmptyListComponent
+import com.example.apodapp.ApodCardComponent
+import com.example.apodapp.MainViewModel
 
 @Composable
 fun FavoritesScreen(viewModel: MainViewModel) {

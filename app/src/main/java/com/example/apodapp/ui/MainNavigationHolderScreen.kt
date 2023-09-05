@@ -1,4 +1,4 @@
-package com.example.apodapp
+package com.example.apodapp.ui
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -9,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.apodapp.MainViewModel
 
 @Composable
 fun MainNavigationHolderScreen(

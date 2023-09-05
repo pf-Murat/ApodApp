@@ -1,4 +1,4 @@
-package com.example.apodapp
+package com.example.apodapp.ui
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker
@@ -26,11 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.apodapp.ui.theme.EmptyListComponent
+import com.example.apodapp.ApodCardComponent
+import com.example.apodapp.MainViewModel
+import com.example.apodapp.calendarEnd
+import com.example.apodapp.calendarStart
+import com.example.apodapp.getBackEndTime
 import java.util.Calendar
 
 
-private const val PAGE_SIZE = 20
 
 @Composable
 fun SearchScreen(viewModel: MainViewModel) {
@@ -44,10 +47,6 @@ fun SearchScreen(viewModel: MainViewModel) {
         if (isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
-
-        val calendarStart = Calendar.getInstance()
-        val calendarEnd = Calendar.getInstance()
-        calendarStart.add(Calendar.DATE, -PAGE_SIZE)
 
         var startDateForBackend by remember { mutableStateOf(calendarStart.getBackEndTime()) }
         var endDateForBackend by remember { mutableStateOf(calendarEnd.getBackEndTime()) }
@@ -155,6 +154,3 @@ fun SearchScreen(viewModel: MainViewModel) {
         }
     }
 }
-
-private fun Calendar.getBackEndTime() =
-    "${this[Calendar.YEAR]}-${this[Calendar.MONTH].inc()}-${this[Calendar.DAY_OF_MONTH]}"

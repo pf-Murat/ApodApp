@@ -1,4 +1,4 @@
-package com.example.apodapp
+package com.example.apodapp.ui
 
 import android.content.Context
 import android.content.Intent
@@ -12,9 +12,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toUri
 import androidx.navigation.compose.rememberNavController
+import com.example.apodapp.MainViewModel
 import com.example.apodapp.ui.theme.ApodAppTheme
 
 private val navBarScreens = listOf(
@@ -29,7 +31,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
-            val viewModel = MainViewModel()
+            val viewModel = MainViewModel(this.applicationContext)
             ApodAppTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -55,7 +57,8 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    val viewModel = MainViewModel()
+    val context = LocalContext.current
+    val viewModel = MainViewModel(context)
     ApodAppTheme {
         SearchScreen(viewModel)
     }

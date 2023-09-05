@@ -33,7 +33,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.apodapp.ui.theme.ApodItem
+import com.example.apodapp.data.ApodItem
+import com.example.apodapp.ui.shareTextWithImage
 
 @Composable
 fun ApodCardComponent(

@@ -1,4 +1,4 @@
-package com.example.apodapp
+package com.example.apodapp.ui
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -25,7 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.apodapp.ui.theme.EmptyListComponent
+import com.example.apodapp.ApodCardComponent
+import com.example.apodapp.MainViewModel
 
 private const val PAGE_COUNT = 50
 
@@ -96,7 +97,7 @@ fun ExploreScreen(viewModel: MainViewModel) {
                         confirmValueChange = { dismissValue ->
                             when (dismissValue) {
                                 DismissValue.DismissedToEnd -> {
-                                    viewModel.removeFromExplores(item)
+                                    viewModel.removeFromExploresAndAddToFavs(item)
                                     false
                                 }
 

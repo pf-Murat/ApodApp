@@ -1,23 +1,35 @@
 package com.example.apodapp
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.apodapp.ui.theme.ApodApi
-import com.example.apodapp.ui.theme.ApodItem
+import androidx.room.Room
+import com.example.apodapp.data.ApodApi
+import com.example.apodapp.data.ApodItem
+import com.example.apodapp.data.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.Calendar
+
+private const val PAGE_SIZE = 20
+
+val calendarStart = Calendar.getInstance()
+val calendarEnd = Calendar.getInstance()
 
 private const val BASE_URL = "https://api.nasa.gov/planetary/"
 private const val EXPLORE_PAGE_SIZE = 50
 
-class MainViewModel : ViewModel() {
-
+class MainViewModel(
+    val context: Context
+) : ViewModel() {
     private val apodApi by lazy { getApodApi() }
+    private val apodDb by lazy { getRoomDatabase(context = context) }
     var searchApods: MutableStateFlow<List<ApodItem>> = MutableStateFlow(emptyList())
         private set
     var exploreApods: MutableStateFlow<List<ApodItem>> = MutableStateFlow(emptyList())
@@ -33,9 +45,11 @@ class MainViewModel : ViewModel() {
         private set
 
     init {
+        calendarStart.add(Calendar.DATE, -PAGE_SIZE)
+
         getApods(
-            startDate = "2023-01-01",
-            endDate = "2023-01-20",
+            startDate = calendarStart.getBackEndTime(),
+            endDate = calendarEnd.getBackEndTime(),
             isForceRefresh = true
         )
 
@@ -43,6 +57,22 @@ class MainViewModel : ViewModel() {
             count = EXPLORE_PAGE_SIZE,
             isForceRefresh = true
         )
+
+    }
+
+    private fun subscribeToSavedApods() {
+        viewModelScope.launch {
+            apodDb.apodDao().getAll().collectLatest { savedApodList ->
+                savedApods.update { savedApodList.toSet() }
+                val savedIds = savedApodList.map { it.date }
+                val updatedSearchApodsWithSave = searchApods.value.toMutableList().map { apod ->
+                    apod.copy(isFavorited = savedIds.contains(apod.date))
+                }
+                searchApods.update {
+                    updatedSearchApodsWithSave
+                }
+            }
+        }
     }
 
     fun clearErrorState() {
@@ -80,6 +110,7 @@ class MainViewModel : ViewModel() {
                         errorState.update { "Response was not successful" }
                     }
                 }
+                subscribeToSavedApods()
             } catch (ex: Throwable) {
                 errorState.update { ex.cause.toString() }
             }
@@ -87,9 +118,8 @@ class MainViewModel : ViewModel() {
     }
 
     fun addToFavorites(apodItem: ApodItem) {
-        savedApods.update { apodItems ->
-            val updatedList = listOf(apodItem.copy(isFavorited = true)) + apodItems
-            updatedList.toSet()
+        viewModelScope.launch {
+            apodDb.apodDao().insertAll(apodItem.copy(isFavorited = true))
         }
         val updatedList =
             searchApods.value.map { apod ->
@@ -103,9 +133,8 @@ class MainViewModel : ViewModel() {
     }
 
     fun removeFromFavorites(apodItem: ApodItem) {
-        savedApods.update { apodItems ->
-            val mutableApodList = apodItems.toMutableList()
-            mutableApodList.filter { item -> item.date != apodItem.date }.toSet()
+        viewModelScope.launch {
+            apodDb.apodDao().delete(apodItem)
         }
         val updatedListItem =
             searchApods.value.map { apod ->
@@ -124,8 +153,24 @@ class MainViewModel : ViewModel() {
             updatedList
         }
     }
+
+    fun removeFromExploresAndAddToFavs(apodItem: ApodItem) {
+        removeFromExplores(apodItem)
+        addToFavorites(apodItem)
+    }
 }
 
 fun getApodApi() =
     Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build()
         .create(ApodApi::class.java)
+
+fun getRoomDatabase(context: Context): AppDatabase {
+    return Room.databaseBuilder(
+        context,
+        AppDatabase::class.java, "database-apod"
+    ).build()
+}
+
+
+fun Calendar.getBackEndTime() =
+    "${this[Calendar.YEAR]}-${this[Calendar.MONTH].inc()}-${this[Calendar.DAY_OF_MONTH]}"
