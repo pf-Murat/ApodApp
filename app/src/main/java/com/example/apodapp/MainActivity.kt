@@ -13,6 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.net.toUri
 import androidx.navigation.compose.rememberNavController
 import com.example.apodapp.ui.theme.ApodAppTheme
 
@@ -66,10 +67,10 @@ fun Context.shareTextWithImage(
 ) {
     val share = Intent.createChooser(Intent().apply {
         action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, imageUrl)
-        putExtra(Intent.EXTRA_TITLE, title)
+        putExtra(Intent.EXTRA_TEXT, title)
+        putExtra(Intent.EXTRA_STREAM, imageUrl.toUri())
         flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-        type = "text/plain"
+        type = "image/jpeg"
 
     }, null)
 

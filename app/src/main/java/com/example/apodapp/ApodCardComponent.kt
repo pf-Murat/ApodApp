@@ -41,6 +41,7 @@ fun ApodCardComponent(
     onFavClicked: () -> Unit,
     showLikeButton: Boolean = true,
     showShareButton: Boolean = true,
+    paintColor: Color = Color.Transparent
 ) {
     val context = LocalContext.current
     Card(
@@ -139,6 +140,10 @@ fun ApodCardComponent(
                     }
                 }
             }
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .background(color = paintColor))
+
         }
     }
 }

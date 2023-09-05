@@ -117,6 +117,13 @@ class MainViewModel : ViewModel() {
             }
         searchApods.update { updatedListItem }
     }
+
+    fun removeFromExplores(apodItem: ApodItem) {
+        val updatedList = exploreApods.value.toMutableList().filter { it.date != apodItem.date }
+        exploreApods.update { apodItems ->
+            updatedList
+        }
+    }
 }
 
 fun getApodApi() =
