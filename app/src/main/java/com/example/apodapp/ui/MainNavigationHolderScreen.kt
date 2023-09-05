@@ -5,6 +5,10 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -35,10 +39,17 @@ fun MainScreenBottomNav(
     bottomBarItems: List<NavBarScreens>
 ) {
     NavigationBar {
+        var selectedItem: NavBarScreens? by remember {
+            mutableStateOf(NavBarScreens.Search)
+        }
         bottomBarItems.forEach { item ->
             NavigationBarItem(
-                selected = false,
-                onClick = { navController.navigate(item.route) },
+                selected = selectedItem == item,
+                onClick = {
+                    if (selectedItem == item) return@NavigationBarItem
+                    navController.navigate(item.route)
+                    selectedItem = item
+                },
                 icon = { Icon(imageVector = item.icon, contentDescription = null) },
                 label = { Text(text = stringResource(id = item.titleRes)) }
             )

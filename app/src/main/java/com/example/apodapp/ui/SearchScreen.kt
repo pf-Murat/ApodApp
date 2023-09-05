@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -17,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.apodapp.ApodCardComponent
 import com.example.apodapp.MainViewModel
+import com.example.apodapp.PAGE_SIZE
 import com.example.apodapp.calendarEnd
 import com.example.apodapp.calendarStart
 import com.example.apodapp.getBackEndTime
@@ -43,11 +46,6 @@ fun SearchScreen(viewModel: MainViewModel) {
     val isLoading by viewModel.isSearchLoading.collectAsStateWithLifecycle()
 
     Box(modifier = Modifier.fillMaxSize()) {
-
-        if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
-
         var startDateForBackend by remember { mutableStateOf(calendarStart.getBackEndTime()) }
         var endDateForBackend by remember { mutableStateOf(calendarEnd.getBackEndTime()) }
 
@@ -134,7 +132,17 @@ fun SearchScreen(viewModel: MainViewModel) {
                 EmptyListComponent()
                 return
             }
+            val lazyListState = rememberLazyListState()
+
+            LaunchedEffect(lazyListState.firstVisibleItemIndex) {
+                if (lazyListState.layoutInfo.totalItemsCount >= PAGE_SIZE && !lazyListState.canScrollForward) {
+                    viewModel.getApods(isForceRefresh = false)
+                    startDateForBackend = calendarStart.getBackEndTime()
+                }
+            }
+
             LazyColumn(
+                state = lazyListState,
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -151,6 +159,10 @@ fun SearchScreen(viewModel: MainViewModel) {
                     )
                 }
             }
+        }
+
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }
 }

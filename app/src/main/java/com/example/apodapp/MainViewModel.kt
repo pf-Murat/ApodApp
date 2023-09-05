@@ -17,9 +17,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Calendar
 
-private const val PAGE_SIZE = 20
+const val PAGE_SIZE = 5
 
 val calendarStart = Calendar.getInstance()
+
 val calendarEnd = Calendar.getInstance()
 
 private const val BASE_URL = "https://api.nasa.gov/planetary/"
@@ -46,17 +47,14 @@ class MainViewModel(
 
     init {
         calendarStart.add(Calendar.DATE, -PAGE_SIZE)
-
-        getApods(
-            startDate = calendarStart.getBackEndTime(),
-            endDate = calendarEnd.getBackEndTime(),
-            isForceRefresh = true
-        )
+        calendarEnd.add(Calendar.DATE, -1)
+        getApods(isForceRefresh = true)
 
         getApods(
             count = EXPLORE_PAGE_SIZE,
             isForceRefresh = true
         )
+        subscribeToSavedApods()
 
     }
 
@@ -79,6 +77,18 @@ class MainViewModel(
         errorState.update { null }
     }
 
+    fun getApods(isForceRefresh: Boolean = false) {
+        if (!isForceRefresh) {
+            calendarStart.add(Calendar.DATE, -PAGE_SIZE)
+            calendarEnd.add(Calendar.DATE, -PAGE_SIZE)
+        }
+        getApods(
+            startDate = calendarStart.getBackEndTime(),
+            endDate = calendarEnd.getBackEndTime(),
+            isForceRefresh = isForceRefresh
+        )
+    }
+
     fun getApods(
         startDate: String? = null,
         endDate: String? = null,
@@ -87,6 +97,7 @@ class MainViewModel(
     ) {
         val isSearchCall = !startDate.isNullOrEmpty() && !endDate.isNullOrEmpty()
         val isExploreCall = count != null
+
         if (isSearchCall) isSearchLoading.update { true } else if (isExploreCall) isExploreLoading.update { true }
 
         if (isForceRefresh) searchApods.update { emptyList() }
@@ -102,15 +113,17 @@ class MainViewModel(
                     if (isSearchCall) isSearchLoading.update { false } else if (isExploreCall) isExploreLoading.update { false }
                     if (response.isSuccessful) {
                         if (isSearchCall) {
-                            searchApods.update { apodList -> apodList + response.body().orEmpty() }
+                            searchApods.update { apodList ->
+                                apodList + response.body().orEmpty().reversed()
+                            }
                         } else if (isExploreCall) {
                             exploreApods.update { apodList -> response.body().orEmpty() }
                         }
+                        subscribeToSavedApods()
                     } else {
                         errorState.update { "Response was not successful" }
                     }
                 }
-                subscribeToSavedApods()
             } catch (ex: Throwable) {
                 errorState.update { ex.cause.toString() }
             }
