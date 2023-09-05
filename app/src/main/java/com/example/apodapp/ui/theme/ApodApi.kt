@@ -19,15 +19,16 @@ interface ApodApi {
 }
 
 data class ApodItem(
-    val copyright: String,
-    val date: String,
-    val explanation: String,
+    val copyright: String = "",
+    val date: String = "",
+    val explanation: String = "",
     @SerializedName("media_type")
-    val mediaType: String,
+    val mediaType: String = "",
     @SerializedName("service_version")
-    val serviceVersion: String,
-    val title: String,
-    val url: String,
+    val serviceVersion: String = "",
+    val title: String = "",
+    val url: String = "",
     @SerializedName("hdurl")
-    val hdUrl: String
+    val hdUrl: String = "",
+    val isFavorited: Boolean = false
 )

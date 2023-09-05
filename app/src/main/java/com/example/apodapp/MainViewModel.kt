@@ -77,7 +77,7 @@ class MainViewModel : ViewModel() {
                             exploreApods.update { apodList -> response.body().orEmpty() }
                         }
                     } else {
-                        errorState.update { "Empty List Fetched" }
+                        errorState.update { "Response was not successful" }
                     }
                 }
             } catch (ex: Throwable) {
@@ -88,18 +88,37 @@ class MainViewModel : ViewModel() {
 
     fun addToFavorites(apodItem: ApodItem) {
         savedApods.update { apodItems ->
-            val updatedList = listOf(apodItem) + apodItems
+            val updatedList = listOf(apodItem.copy(isFavorited = true)) + apodItems
             updatedList.toSet()
         }
+        val updatedList =
+            searchApods.value.map { apod ->
+                if (apod.date == apodItem.date) {
+                    apod.copy(isFavorited = true)
+                } else {
+                    apod
+                }
+            }
+        searchApods.update { updatedList }
     }
 
     fun removeFromFavorites(apodItem: ApodItem) {
         savedApods.update { apodItems ->
             val mutableApodList = apodItems.toMutableList()
-            mutableApodList.remove(apodItem)
-            mutableApodList.toSet()
+            mutableApodList.filter { item -> item.date != apodItem.date }.toSet()
         }
+        val updatedListItem =
+            searchApods.value.map { apod ->
+                if (apod.date == apodItem.date) {
+                    apod.copy(isFavorited = false)
+                } else {
+                    apod
+                }
+            }
+        searchApods.update { updatedListItem }
     }
 }
 
-fun getApodApi() = Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build().create(ApodApi::class.java)
+fun getApodApi() =
+    Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build()
+        .create(ApodApi::class.java)

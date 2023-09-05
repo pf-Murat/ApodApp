@@ -1,5 +1,7 @@
 package com.example.apodapp
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -56,4 +58,20 @@ fun GreetingPreview() {
     ApodAppTheme {
         SearchScreen(viewModel)
     }
+}
+
+fun Context.shareTextWithImage(
+    title: String,
+    imageUrl: String
+) {
+    val share = Intent.createChooser(Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, imageUrl)
+        putExtra(Intent.EXTRA_TITLE, title)
+        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        type = "text/plain"
+
+    }, null)
+
+    startActivity(Intent.createChooser(share, null))
 }

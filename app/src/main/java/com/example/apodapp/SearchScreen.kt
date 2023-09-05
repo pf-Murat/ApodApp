@@ -6,14 +6,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -24,9 +24,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.apodapp.ui.theme.EmptyListComponent
 import java.util.Calendar
 
 
@@ -84,6 +84,13 @@ fun SearchScreen(viewModel: MainViewModel) {
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = "Search",
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(8.dp)
+            )
             val datePickerStart = DatePickerDialog(
                 context,
                 { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDayOfMonth: Int ->
@@ -124,28 +131,25 @@ fun SearchScreen(viewModel: MainViewModel) {
                     Text(text = endDateForBackend)
                 }
             }
-
+            if (apodList.isEmpty() && !isLoading) {
+                EmptyListComponent()
+                return
+            }
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 items(apodList) { item ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxSize(.9f)
-                            .aspectRatio(1f)
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = item.date,
-                                textAlign = TextAlign.Center
-                            )
+                    ApodCardComponent(
+                        apodItem = item,
+                        onFavClicked = {
+                            if (!item.isFavorited)
+                                viewModel.addToFavorites(item)
+                            else
+                                viewModel.removeFromFavorites(item)
                         }
-                    }
+                    )
                 }
             }
         }
